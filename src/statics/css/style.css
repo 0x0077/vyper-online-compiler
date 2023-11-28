@@ -1,0 +1,152 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+#header {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+#main {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+}
+
+#settings {
+    margin-bottom: 20px;
+}
+
+
+#codeInput {
+    width: 100%;
+    min-height: 300px; 
+    max-height: 80vh; 
+    overflow-y: auto; 
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-sizing: border-box; 
+}
+
+#bytecodeOutput, #abiOutput {
+    width: 100%;
+    height: 100px; 
+    margin-bottom: 20px;
+    padding: 8px;
+    font-family: monospace; 
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+
+#results div {
+    margin-bottom: 20px;
+}
+
+#results label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#results button {
+    margin-top: 5px;
+}
+
+#errorBox {
+    color: red;
+    display: none;
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    background: #ffdddd;
+    border: 1px solid #ffcccc;
+    padding: 10px;
+}
+
+#successModal {
+    display: none;
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    background-color: #28a745;
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+    z-index: 100;
+}
+
+#contractAddressContainer {
+    display: none; 
+    margin-top: 30px; 
+}
+  
+#contractAddress {
+    width: 100%; 
+    padding: 8px; 
+    margin-top: 5px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px;
+}
+
+#loadingIndicator img {
+    width: 50px;
+    height: 50px;
+    margin-top: 5px;
+}
+
+#constructorParamsContainer {
+    display: none; 
+    background-color: #f2f2f2; 
+    padding: 10px;
+    margin-top: 10px;
+}
+
+#constructorParams label, 
+#constructorParams input {
+    display: block; 
+    margin-bottom: 5px; 
+}
+
+#constructorParams input {
+    min-width: 33%; 
+    padding: 5px;
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    right: 0;
+    bottom: 100px; /* Location of the box */
+    background-color: #ff6666; /* Red background */
+    color: white;
+    border-top-right-radius: 10px;
+    padding: 20px;
+    z-index: 1; /* Sit on top */
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal-content {
+    margin: 15px;
+}
+
+.close-button {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+

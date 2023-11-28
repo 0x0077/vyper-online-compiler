@@ -1,0 +1,9 @@
+{
+	"evm_version": [
+		"istanbul",
+		"berlin",
+		"paris",
+		"shanghai",
+		"cancun"
+	]
+}

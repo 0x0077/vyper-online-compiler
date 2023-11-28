@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vyper Compile Online</title>
+    <link rel="icon" type="image/png" href="/statics/images/icon.png">
+    <link rel="stylesheet" type="text/css" href="/statics/css/style.css">
+</head>
+<body>
+    <div id="header">Vyper Online Compiler</div>
+
+    <div id="main">
+        <div id="settings">
+            <select id="vyperVersion">
+                <option value="0.3.1">0.3.1</option>
+                <option value="0.3.2">0.3.2</option>
+				<option value="0.3.3">0.3.3</option>
+				<option value="0.3.4">0.3.4</option>
+				<option value="0.3.5">0.3.5</option>
+				<option value="0.3.6">0.3.6</option>
+                <option value="0.3.7">0.3.7</option>
+                <option value="0.3.8">0.3.8</option>
+				<option value="0.3.9" selected>0.3.9</option>
+				<option value="0.3.10">0.3.10</option>
+            </select>
+
+            <select id="evmVersion">
+                <option value="istanbul">istanbul</option>
+                <option value="berlin">berlin</option>
+                <option value="paris" selected>paris</option>
+                <option value="shanghai">shanghai</option>
+            </select>
+
+            <button id="connectWallet">Connect Wallet</button>
+        </div>
+
+        <textarea id="codeInput" placeholder="Enter your code to here..."></textarea>
+
+        <button id="compileButton">Compile</button>
+        <button id="deployButton">Deploy</button>
+
+        <div id="loadingIndicator" style="display: none;">
+            <img src="/statics/images/loading.gif" alt="Loading..." /> 
+        </div>
+
+        <div id="constructorParamsContainer" style="background-color: #f2f2f2; padding: 10px;">
+            <div id="constructorParams"></div>
+        </div>
+
+        <div id="contractAddressContainer" style="display: none;">
+            <label for="contractAddress">Contract Address:</label>
+            <input type="text" id="contractAddress" readonly>
+        </div>
+
+        <div id="results">
+            <div id="bytecodeSection">
+                <label>Bytecode:</label>
+                <textarea id="bytecodeOutput" readonly></textarea>
+                <button onclick="copyToClipboard('bytecodeOutput')">Copy</button>
+            </div>
+            <div id="abiSection">
+                <label>ABI:</label>
+                <textarea id="abiOutput" readonly></textarea>
+                <button onclick="copyToClipboard('abiOutput')">Copy</button>
+            </div>
+        </div>
+
+
+        <div id="errorModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" onclick="closeModal()">&times;</span>
+                <p id="errorText"></p>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script src="/statics/js/script.js?v=3"></script>
+    <script>
+        function copyToClipboard(elementId) {
+            var copyText = document.getElementById(elementId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); 
+            document.execCommand("copy");
+            alert("Copied: " + copyText.value); 
+        }
+    </script>
+
+</body>
+</html>

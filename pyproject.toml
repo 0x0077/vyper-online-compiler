@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "Vyper Online Compiler"
+version = "0.1.0"
+description = ""
+authors = ["0x77"]
+readme = "README.md"
+packages = []
+
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4"
+vyper = "0.3.9"
+poetry = "1.7.1"
+sanic = "^23.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
