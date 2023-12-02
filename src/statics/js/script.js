@@ -71,7 +71,7 @@ function compileContract(code, version, environment) {
         evm_version: environment
     };
 
-    fetch('https://compile.vyperonline.com/vyper/compile', { 
+    fetch('http://127.0.0.1:8000/vyper/compile', { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
