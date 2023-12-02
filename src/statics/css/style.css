@@ -15,22 +15,21 @@ html {
 .content {
     display: flex;
     flex: 1;
+    flex-direction: row;
+    align-items: stretch;
 }
 
 .editor {
+    display: flex;
     flex: 6;
     padding: 10px;
-    display: flex;
-    margin-bottom: 20px;
-}
-
-.editor textarea {
-    width: 100%;
-    height: 100%;
     border: 1px solid black;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    box-sizing: border-box;
-    resize: none;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    margin-right: 10px;
+    flex-direction: column;
+    height: 0;
+    min-height: 500px;
 }
 
 .sidebar {
@@ -360,6 +359,30 @@ html {
 }
 
 
+.CodeMirror {
+    flex-grow: 1;
+    width: 100%; 
+    height: 100px; 
+    border: 1px solid black;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    box-sizing: border-box;
+}
+
+
+.CodeMirror-scroll {
+    overflow-y: hidden; 
+    overflow-x: auto; 
+}
+
+.CodeMirror-activeline-background {
+    background: #e8f2ff; 
+}
+
+.CodeMirror-matchingbracket {
+    color: #42b983;  
+    text-decoration: underline; 
+}
+
 
 @media (min-width: 768px) {
     .wrapper {
@@ -367,20 +390,16 @@ html {
     }
 
     .editor {
-        /* 编辑器占据更多空间 */
         width: 70%;
     }
 
     .sidebar {
-        /* 侧边栏占据剩余空间 */
         width: 30%;
     }
 }
 
-/* 媒体查询：屏幕宽度大于1024px时的布局 */
 @media (min-width: 1024px) {
     .editor {
-        /* 在大屏幕上进一步调整宽度 */
         width: 75%;
     }
 

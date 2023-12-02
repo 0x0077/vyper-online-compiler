@@ -7,13 +7,27 @@
 	<title>Vyper Online Compiler</title>
     <link rel="icon" type="image/png" href="/statics/images/icon.png">
 	<link rel="stylesheet" type="text/css" href="/statics/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/python-hint.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/addon/edit/matchbrackets.js"></script>
+	<script src="/statics/js/editor.js?v=1"></script>
 </head>
 
 <body>
 	<div class="wrapper">
         <div class="content">
             <div class="editor">
-                <textarea id="codeInput" placeholder="Enter your vyper code..."></textarea>
+                <textarea id="codeInput" name="codeInput" placeholder="Enter your vyper code..."></textarea>
             </div>
 
             <div class="sidebar">
@@ -131,8 +145,6 @@
         </div>
 
 	</div>
-
-
 
 	<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
 	<script src="/statics/js/script.js?v=5"></script>

@@ -71,7 +71,7 @@ function compileContract(code, version, environment) {
         evm_version: environment
     };
 
-    fetch('http://127.0.0.1:8000/vyper/compile', { 
+    fetch('https://compile.vyperonline.com/vyper/compile', { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -229,7 +229,3 @@ document.getElementById('deployButton').addEventListener('click', async (event) 
 });
 
 
-document.getElementById('codeInput').addEventListener('input', function() {
-    this.style.height = 'auto'; 
-    this.style.height = (this.scrollHeight) + 'px'; 
-});
