@@ -1,6 +1,27 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 	var codeInput = document.getElementById("codeInput");
+	var defaultCode = `
+# @version 0.3.9
+"""
+@title Default code
+@author 0x77
+@license Copyright (c) VyperOnline, 2023-2025 - all rights reserved
+"""
+
+owner: public(address)
+name: public(String[12])
+
+
+@payable
+@external
+def __init__():
+	self.owner = msg.sender
+	self.name = "Hello Vyper!"
+	`;
+
+	codeInput.value = defaultCode.trim();
+
 	var editor = CodeMirror.fromTextArea(codeInput, {
 		lineNumbers: true,
 		mode: "python",
@@ -9,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		tabSize: 4,
 		indentWithTabs: true,
 		autoCloseBrackets: true,
-		extraKeys: {"Ctrl-Space": "autocomplete"},
+		extraKeys: { "Ctrl-Space": "autocomplete" },
 		matchBrackets: true,
 		hintOptions: {
 			tables: {
