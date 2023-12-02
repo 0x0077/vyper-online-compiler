@@ -1,90 +1,142 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Vyper Compile Online</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Vyper Online Compiler</title>
     <link rel="icon" type="image/png" href="/statics/images/icon.png">
-    <link rel="stylesheet" type="text/css" href="/statics/css/style.css">
+	<link rel="stylesheet" type="text/css" href="/statics/css/style.css">
 </head>
+
 <body>
-    <div id="header">Vyper Online Compiler</div>
-
-    <div id="main">
-        <div id="settings">
-            <select id="vyperVersion">
-                <option value="0.3.1">0.3.1</option>
-                <option value="0.3.2">0.3.2</option>
-				<option value="0.3.3">0.3.3</option>
-				<option value="0.3.4">0.3.4</option>
-				<option value="0.3.5">0.3.5</option>
-				<option value="0.3.6">0.3.6</option>
-                <option value="0.3.7">0.3.7</option>
-                <option value="0.3.8">0.3.8</option>
-				<option value="0.3.9" selected>0.3.9</option>
-				<option value="0.3.10">0.3.10</option>
-            </select>
-
-            <select id="evmVersion">
-                <option value="istanbul">istanbul</option>
-                <option value="berlin">berlin</option>
-                <option value="paris" selected>paris</option>
-                <option value="shanghai">shanghai</option>
-            </select>
-
-            <button id="connectWallet">Connect Wallet</button>
-        </div>
-
-        <textarea id="codeInput" placeholder="Enter your code to here..."></textarea>
-
-        <button id="compileButton">Compile</button>
-        <button id="deployButton">Deploy</button>
-
-        <div id="loadingIndicator" style="display: none;">
-            <img src="/statics/images/loading.gif" alt="Loading..." /> 
-        </div>
-
-        <div id="constructorParamsContainer" style="background-color: #f2f2f2; padding: 10px;">
-            <div id="constructorParams"></div>
-        </div>
-
-        <div id="contractAddressContainer" style="display: none;">
-            <label for="contractAddress">Contract Address:</label>
-            <input type="text" id="contractAddress" readonly>
-        </div>
-
-        <div id="results">
-            <div id="bytecodeSection">
-                <label>Bytecode:</label>
-                <textarea id="bytecodeOutput" readonly></textarea>
-                <button onclick="copyToClipboard('bytecodeOutput')">Copy</button>
+	<div class="wrapper">
+        <div class="content">
+            <div class="editor">
+                <textarea id="codeInput" placeholder="Enter your vyper code..."></textarea>
             </div>
-            <div id="abiSection">
-                <label>ABI:</label>
-                <textarea id="abiOutput" readonly></textarea>
-                <button onclick="copyToClipboard('abiOutput')">Copy</button>
+
+            <div class="sidebar">
+                <div class="compile-section">
+                    <div class="compile-setting">
+                        <label for="version">VERSION</label>
+                        <select id="version">
+                            <option value="0.3.1">0.3.1</option>
+                            <option value="0.3.2">0.3.2</option>
+                            <option value="0.3.3">0.3.3</option>
+                            <option value="0.3.4">0.3.4</option>
+                            <option value="0.3.5">0.3.5</option>
+                            <option value="0.3.6">0.3.6</option>
+                            <option value="0.3.7">0.3.7</option>
+                            <option value="0.3.8">0.3.8</option>
+                            <option value="0.3.9" selected>0.3.9</option>
+                            <option value="0.3.10">0.3.10</option>
+                        </select>
+                    </div>
+
+                    <div class="compile-setting">
+                        <label for="environment">ENVIRONMENT</label>
+                        <select id="environment">
+                            <option value="istanbul">Vyper VM (Istanbul)</option>
+                            <option value="berlin">Vyper VM (Berlin)</option>
+                            <option value="paris" selected>Vyper VM (Paris)</option>
+                            <option value="shanghai">Vyper VM (Shanghai)</option>
+                            <option value="metamask">Injected provider (metamask)</option>
+                        </select>
+                    </div>
+
+                    <div class="compile-wrapper">
+                        <label for="compile-title">VYPER COMPILE</label>
+                        <button id="compileButton" class="compile-button">Compile</button>
+                    </div>
+                </div>
+
+                <div class="output-container">
+                    <div class="output-field">
+                        <label for="bytecode">BYTECODE</label>
+                        <div class="output-text">
+                            <input type="text" id="bytecodeOutput" value="..." readonly>
+                            <button onclick="copyToClipboard('bytecodeOutput')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="output-field">
+                        <label for="abi">ABI</label>
+                        <div class="output-text">
+                            <input type="text" id="abiOutput" value="..." readonly>
+                            <button onclick="copyToClipboard('abiOutput')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="constructor-container">
+                    <label>CONSTRUCTOR</label>
+                    <div id="constructorParamsContainer" style="background-color: #f2f2f2; padding: 10px;">
+                        <div id="constructorParams"></div>
+                    </div>
+                </div>
+
+                <div class="deploy-container">
+                    <div class="account">
+                        <label for="account">ACCOUNT</label>
+                        <div class="account-text">
+                            <input type="text" id="account" value="" readonly>
+                        </div>
+                    </div>
+
+                    <div class="setting">
+                        <label for="gasLimit">GAS LIMIT</label>
+                        <div class="gas-limit-text">
+                            <input type="text" id="gasLimit" value="3000000">
+                        </div>
+                    </div>
+
+                    <div class="setting">
+                        <label for="value">VALUE</label>
+                        <div class="value-text">
+                            <input type="text" id="value" placeholder="0">
+                            <select id="unit">
+                                <option value="wei">Wei</option>
+                                <option value="gwei">Gwei</option>
+                                <option value="finney">Finney</option>
+                                <option value="ether">Ether</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="deployButton" class="deploy-button">Deploy</button>
+                </div>
+
+                <div class="contract-container">
+                    <div class="contract-address">
+                        <label for="contract-address">CONTRACT ADDRESS</label>
+                        <div class="contract-address-text">
+                            <input type="text" id="address" value="..." readonly>
+                            <button onclick="copyToClipboard('address')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="errorModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-button" onclick="closeModal()">&times;</span>
+                        <p id="errorText"></p>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-
-        <div id="errorModal" class="modal">
-            <div class="modal-content">
-                <span class="close-button" onclick="closeModal()">&times;</span>
-                <p id="errorText"></p>
-            </div>
+        <div class="footer">
+            Power by <a href="https://github.com/0x0077" target="_blank" rel="noopener noreferrer">@0x77</a> ❤️
         </div>
 
-    </div>
+	</div>
 
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
-    <script src="/statics/js/script.js?v=3"></script>
-    <script>
-        function copyToClipboard(elementId) {
-            var copyText = document.getElementById(elementId);
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); 
-            document.execCommand("copy");
-            alert("Copied: " + copyText.value); 
-        }
-    </script>
+
+
+	<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+	<script src="/statics/js/script.js?v=5"></script>
 
 </body>
+
 </html>

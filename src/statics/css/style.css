@@ -1,133 +1,343 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    line-height: 1.6;
+body,
+html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    height: 100%;
 }
 
-#header {
-    background: #333;
-    color: #fff;
-    text-align: center;
-    padding: 1rem 0;
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-#main {
-    width: 80%;
-    margin: 20px auto;
-    padding: 20px;
-    background: white;
+.content {
+    display: flex;
+    flex: 1;
 }
 
-#settings {
-    margin-bottom: 20px;
-}
-
-
-#codeInput {
-    width: 100%;
-    min-height: 300px; 
-    max-height: 80vh; 
-    overflow-y: auto; 
+.editor {
+    flex: 6;
     padding: 10px;
-    border: 1px solid #ccc;
-    box-sizing: border-box; 
+    display: flex;
+    margin-bottom: 20px;
 }
 
-#bytecodeOutput, #abiOutput {
+.editor textarea {
     width: 100%;
-    height: 100px; 
-    margin-bottom: 20px;
-    padding: 8px;
-    font-family: monospace; 
-    border: 1px solid #ddd;
+    height: 100%;
+    border: 1px solid black;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     box-sizing: border-box;
+    resize: none;
+}
+
+.sidebar {
+    display: flex;
+    flex: 4;
+    background-color: #f8f8f8;
+    border: 1px solid black;
+    padding: 10px;
+    flex-direction: column;
+    overflow-y: auto;
+    margin-top: 10px;
+    margin-bottom: 30px;
 }
 
 
-#results div {
-    margin-bottom: 20px;
+.compile-section {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
 }
 
-#results label {
-    display: block;
+.compile-setting {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
+}
+
+.compile-setting label {
+    font-size: 10px;
+    color: #6C6C6C;
     margin-bottom: 5px;
 }
 
-#results button {
-    margin-top: 5px;
+.compile-setting select {
+    padding: 5px 10px;
+    border: 1px solid black;
+    cursor: pointer;
+    outline: none;
 }
 
-#errorBox {
-    color: red;
-    display: none;
-    position: fixed;
-    right: 10px;
-    bottom: 10px;
-    background: #ffdddd;
-    border: 1px solid #ffcccc;
+.compile-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-right: 1px;
+}
+
+.compile-wrapper label {
+    font-size: 10px;
+    color: #6C6C6C;
+    margin-bottom: 5px;
+}
+
+.compile-button {
+    padding: 5px 40px;
+    background-color: yellow;
+    border: 1px solid black;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+
+.output-container {
+    border: 1px solid black;
     padding: 10px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    margin-bottom: 10px;
 }
 
-#successModal {
-    display: none;
-    position: fixed;
-    right: 30px;
-    bottom: 30px;
-    background-color: #28a745;
-    color: white;
-    padding: 20px;
-    border-radius: 5px;
-    z-index: 100;
+.output-field {
+    margin-bottom: 10px;
 }
 
-#contractAddressContainer {
-    display: none; 
-    margin-top: 30px; 
-}
-  
-#contractAddress {
-    width: 100%; 
-    padding: 8px; 
-    margin-top: 5px; 
-    border: 1px solid #ccc; 
-    border-radius: 4px;
+.output-field label {
+    display: block;
+    font-size: 10px;
+    color: #6C6C6C;
+    margin-bottom: 5px;
 }
 
-#loadingIndicator img {
-    width: 50px;
-    height: 50px;
-    margin-top: 5px;
+.output-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-#constructorParamsContainer {
-    display: none; 
-    background-color: #f2f2f2; 
-    padding: 10px;
-    margin-top: 10px;
-}
-
-#constructorParams label, 
-#constructorParams input {
-    display: block; 
-    margin-bottom: 5px; 
-}
-
-#constructorParams input {
-    min-width: 33%; 
+.output-text input[type="text"] {
+    flex-grow: 1;
+    border: 1px solid #ccc;
     padding: 5px;
+    font-family: monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
+
+.output-text button {
+    padding: 5px 10px;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.output-text button:hover {
+    background-color: #e7e7e7;
+}
+
+
+.deploy-container {
+    border: 1px solid black;
+    padding: 10px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    margin-bottom: 10px;
+}
+
+.account {
+    margin-bottom: 10px;
+}
+
+.account label {
+    display: block;
+    font-size: 10px;
+    color: #6C6C6C;
+    margin-bottom: 5px;
+}
+
+.account-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.account-text input[type="text"] {
+    width: 40%;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-family: monospace;
+    white-space: nowrap;
+    font-size: 10px;
+}
+
+
+.setting {
+    margin-bottom: 10px;
+}
+
+.setting label {
+    display: block;
+    font-size: 10px;
+    color: #6C6C6C;
+    margin-bottom: 5px;
+}
+
+.gas-limit-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gas-limit-text input[type="text"] {
+    width: 20%;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+.value-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.value-text input[type="text"] {
+    width: 50%;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+.value-text select {
+    width: 20%;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+
+.deploy-button {
+    padding: 10px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid black;
+    background-color: yellow;
+    color: black;
+    margin-bottom: 10px;
+    cursor: pointer;
+    position: relative;
+}
+
+.loading-indicator {
+    max-width: 15px; 
+    max-height: 15px; 
+    position: absolute; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+}
+
+
+.contract-container {
+    border: 1px solid black;
+    padding: 10px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    margin-bottom: 10px;
+}
+
+.contract-address label {
+    display: block;
+    font-size: 10px;
+    color: #6C6C6C;
+    margin-bottom: 5px;
+}
+
+.contract-address-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.contract-address-text input[type="text"] {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-family: monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.contract-address-text button {
+    padding: 5px 10px;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.contract-address-text button:hover {
+    background-color: #e7e7e7;
+}
+
+.constructor-container {
+    border: 1px solid black;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    max-height: 100vh;
+    overflow-y: auto;
+    font-family: Arial, sans-serif;
+}
+
+.constructor-container label {
+    margin-top: 5px;
+    display: block;
+    font-size: 10px;
+    color: #6C6C6C;
+    margin-bottom: 10px;
+}
+
+
+.footer {
+    text-align: center;
+    padding: 10px 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f8f8;
+    border-top: 1px solid #ccc;
+}
+
+.footer a {
+    color: #591BB7;
+    text-decoration: none;
+}
+
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
 
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
+    display: none;
+    position: fixed;
     right: 0;
-    bottom: 100px; /* Location of the box */
-    background-color: #ff6666; /* Red background */
+    bottom: 100px;
+    background-color: #ff6666;
     color: white;
     border-top-right-radius: 10px;
     padding: 20px;
-    z-index: 1; /* Sit on top */
+    z-index: 1;
     transition: transform 0.3s ease-in-out;
 }
 
@@ -150,3 +360,61 @@ body {
 }
 
 
+
+@media (min-width: 768px) {
+    .wrapper {
+        display: flex;
+    }
+
+    .editor {
+        /* 编辑器占据更多空间 */
+        width: 70%;
+    }
+
+    .sidebar {
+        /* 侧边栏占据剩余空间 */
+        width: 30%;
+    }
+}
+
+/* 媒体查询：屏幕宽度大于1024px时的布局 */
+@media (min-width: 1024px) {
+    .editor {
+        /* 在大屏幕上进一步调整宽度 */
+        width: 75%;
+    }
+
+    .sidebar {
+        width: 25%;
+    }
+}
+
+
+#constructorParams .param {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+
+#constructorParams label {
+    margin-right: 5px;
+    color: #6C6C6C;
+}
+
+#constructorParams input[type="text"] {
+    flex-grow: 1;
+    margin-left: 8px;
+}
+
+#successModal {
+    display: none;
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    background-color: #28a745;
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+    z-index: 100;
+}

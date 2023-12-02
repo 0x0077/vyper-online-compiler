@@ -1,76 +1,77 @@
 
 let compiledAbi = null;
 let compiledBytecode = null;
+let userAddress = null;
 
 async function connectWallet() {
-    const button = document.getElementById('connectWallet');
-    if (window.ethereum) {
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            button.textContent = accounts[0].substring(0, 6) + '...' + accounts[0].substring(accounts[0].length - 4);
-            button.onclick = disconnectWallet;
-        } catch (error) {
-            console.error("User denied account access");
-        }
+	const environmentSelect = document.getElementById('environment');
+	if (environmentSelect.value === 'metamask') {
+		if (window.ethereum) {
+			try {
+				await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const account = await signer.getAddress();
+                const balance = await provider.getBalance(account);
+                const formattedBalance = parseFloat(ethers.utils.formatEther(balance)).toFixed(4);
+                userAddress = account;
+
+                const formatAccount = account.substring(0, 6) + "..." + account.substring(account.length - 4) + " (" + formattedBalance + " ether" + ")";
+                document.getElementById("account").value = formatAccount;
+
+				console.log('Connected to MetaMask.');
+                console.log("balance: ", formattedBalance);
+                console.log(formatAccount)
+
+			} catch (error) {
+				console.error('User denied account access');
+			}
+		} else {
+			alert('MetaMask is not installed. Please consider installing it: https://metamask.io/');
+		}
+	}
+}
+
+
+function displayConstructorParams(abi) {
+    const constructorAbi = abi.find(element => element.type === 'constructor');
+    const container = document.getElementById('constructorParams');
+    container.innerHTML = ''; 
+
+    if (constructorAbi && constructorAbi.inputs.length > 0) {
+        constructorAbi.inputs.forEach(input => {
+            const paramDiv = document.createElement('div'); 
+            paramDiv.classList.add('param'); 
+
+            const label = document.createElement('label');
+            label.textContent = input.name + ': ';
+            label.htmlFor = input.name; 
+
+            const inputField = document.createElement('input');
+            inputField.type = 'text';
+            inputField.id = input.name; 
+            inputField.placeholder = " " + input.type;
+
+            paramDiv.appendChild(label); 
+            paramDiv.appendChild(inputField);
+            container.appendChild(paramDiv); 
+        });
+
+        document.getElementById('constructorParamsContainer').style.display = 'block';
     } else {
-        alert("Please install MetaMask!");
+        document.getElementById('constructorParamsContainer').style.display = 'none';
     }
 }
 
-function disconnectWallet() {
-    const button = document.getElementById('connectWallet');
-    button.textContent = 'Connect Wallet';
-    button.onclick = connectWallet;
-}
 
-
-async function deployContract(abi, bytecode, constructorArgs) {
-    document.getElementById('loadingIndicator').style.display = 'inline-block';
-
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
-
-    const contractFactory = new ethers.ContractFactory(abi, bytecode, signer);
-    const contract = await contractFactory.deploy(...constructorArgs);
-
-    await contract.deployed();
-
-    document.getElementById('contractAddress').value = contract.address;
-    document.getElementById('contractAddressContainer').style.display = 'block';
-    document.getElementById('loadingIndicator').style.display = 'none';
-
-    const inputs = document.querySelectorAll('#constructorParams input');
-    inputs.forEach(input => input.value = '');
-
-    // 隐藏构造函数参数的显示区域
-    document.getElementById('constructorParamsContainer').style.display = 'none';
-
-    // 清空bytecode和abi数据
-    document.getElementById('bytecodeOutput').value = '';
-    document.getElementById('abiOutput').value = '';
-
-    const successModal = document.createElement('div');
-    successModal.id = 'successModal';
-    successModal.innerHTML = `
-      <p>Contract deployed at: ${contract.address}</p>
-      <button onclick="this.parentElement.style.display='none'">Close</button>
-    `;
-    document.body.appendChild(successModal);
-    setTimeout(() => successModal.style.display = 'block', 100); 
-    setTimeout(() => successModal.style.display = 'none', 60000);
-}
-
-
-
-function compileContract(code, vyperVersion, evmVersion) {
+function compileContract(code, version, environment) {
     const data = {
         code: code,
-        vyper_version: vyperVersion,
-        evm_version: evmVersion
+        vyper_version: version,
+        evm_version: environment
     };
 
-    fetch('http://127.0.0.1:8000/vyper/compile', { 
+    fetch('https://compile.vyperonline.com/vyper/compile', { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -91,16 +92,61 @@ function compileContract(code, vyperVersion, evmVersion) {
             compiledAbi = compiledAbi.replace(/'/g, '"');
             compiledAbi = JSON.parse(compiledAbi);
 
-            displayConstructorParams(compiledAbi);
-
             document.getElementById('bytecodeOutput').value = data.Data.bytecode;
             document.getElementById('abiOutput').value = data.Data.abi;
+
+            displayConstructorParams(compiledAbi);
 
         } else {
             openModal(data.Msg)
         }
     });
 
+}
+
+
+async function deployContract(abi, bytecode, constructorArgs, gasLimit, value) {
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+
+    const contractFactory = new ethers.ContractFactory(abi, bytecode, signer);
+    const contract = await contractFactory.deploy(...constructorArgs, {gasLimit: gasLimit, value: value});
+
+    await contract.deployed();
+
+    document.getElementById('address').value = contract.address;
+
+    const inputs = document.querySelectorAll('#constructorParams input');
+    inputs.forEach(input => input.value = '');
+
+    document.getElementById('constructorParamsContainer').style.display = 'none';
+
+    document.getElementById('bytecodeOutput').value = '...';
+    document.getElementById('abiOutput').value = '...';
+
+    const successModal = document.createElement('div');
+    successModal.id = 'successModal';
+    successModal.innerHTML = `
+      <p>Contract deployed at: ${contract.address}</p>
+      <button onclick="this.parentElement.style.display='none'">Close</button>
+    `;
+    document.body.appendChild(successModal);
+    setTimeout(() => successModal.style.display = 'block', 100); 
+    setTimeout(() => successModal.style.display = 'none', 60000);
+}
+
+
+function copyToClipboard(id) {
+	var copyText = document.getElementById(id);
+	navigator.clipboard.writeText(copyText.value)
+		.then(() => {
+			alert("Copied the text: " + copyText.value);
+		})
+		.catch(err => {
+			console.error('Error in copying text: ', err);
+		});
 }
 
 
@@ -124,62 +170,66 @@ function closeModal() {
 }
 
 
-function displayConstructorParams(abi) {
-    const constructorAbi = abi.find(element => element.type === 'constructor');
-    const container = document.getElementById('constructorParams');
-    container.innerHTML = ''; 
+document.addEventListener('DOMContentLoaded', function () {
+	const environmentSelect = document.getElementById('environment');
+	environmentSelect.addEventListener('change', connectWallet);
+});
 
-    if (constructorAbi && constructorAbi.inputs.length > 0) {
-        const title = document.createElement('h4');
-        title.textContent = 'constructor:';
-        container.appendChild(title);
-
-        constructorAbi.inputs.forEach(input => {
-            const label = document.createElement('label');
-            label.textContent = input.name + ': ';
-            const inputField = document.createElement('input');
-            inputField.type = 'text';
-            inputField.placeholder = input.type;
-            container.appendChild(label);
-            container.appendChild(inputField);
-        });
-
-        document.getElementById('constructorParamsContainer').style.display = 'block';
-    }
-
-}
-
-
-document.getElementById('connectWallet').addEventListener('click', connectWallet);
 
 document.getElementById('compileButton').addEventListener('click', function() {
     closeModal();
 
-    document.getElementById('bytecodeOutput').value = '';
-    document.getElementById('abiOutput').value = '';
+    document.getElementById('bytecodeOutput').value = '...';
+    document.getElementById('abiOutput').value = '...';
+    document.getElementById('address').value = '...';
+    document.getElementById('value').value = '';
 
     var code = document.getElementById('codeInput').value;
-    var vyperVersion = document.getElementById('vyperVersion').value;
-    var evmVersion = document.getElementById('evmVersion').value;
+    var version = document.getElementById('version').value;
+    var environment = document.getElementById('environment').value;
 
-    compileContract(code, vyperVersion, evmVersion);
+    compileContract(code, version, environment);
 
 });
 
-document.getElementById('deployButton').addEventListener('click', async () => {
+
+document.getElementById('deployButton').addEventListener('click', async (event) => {
     if (!compiledAbi || !compiledBytecode) {
         openModal('Please compile the contract first.');
         return;
     }
 
+    const deployButton = event.currentTarget;
+    deployButton.style.backgroundColor = '#f8f8f8';
+    deployButton.innerHTML = '<img src="/statics/images/loading.svg" alt="Loading..." class="loading-indicator">';
+    deployButton.disabled = true;
+
+
     const inputs = document.querySelectorAll('#constructorParams input');
     const constructorArgs = Array.from(inputs).map(input => input.value);
 
-    await deployContract(compiledAbi, compiledBytecode, constructorArgs);
+    const gasLimit = ethers.BigNumber.from(document.getElementById("gasLimit").value);
+    let valueInput = document.getElementById("value").value;
+    let value =  valueInput === "" ? "0" : valueInput
+    const unit = document.getElementById("unit").value;
+
+    value = ethers.utils.parseUnits(value, unit);
+
+    await deployContract(compiledAbi, compiledBytecode, constructorArgs, gasLimit, value)
+        .then(() => {
+            deployButton.style.backgroundColor = 'yellow';
+        })
+        .catch(() => {
+            deployButton.style.backgroundColor = 'yellow';
+        });
+
+    deployButton.innerHTML = "Deploy";
+    deployButton.disabled = false;
+    document.getElementById('value').value = '';
 });
+
 
 document.getElementById('codeInput').addEventListener('input', function() {
     this.style.height = 'auto'; 
     this.style.height = (this.scrollHeight) + 'px'; 
 });
-
