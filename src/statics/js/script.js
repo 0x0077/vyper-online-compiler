@@ -1,36 +1,75 @@
 
 let compiledAbi = null;
 let compiledBytecode = null;
-let userAddress = null;
+let ganacheAccounts = null;
+let w3 = null;
+
+async function ganacheProvider(envVersion) {
+    const options = {
+        hardfork: envVersion
+    };
+    
+    const provider = Ganache.provider(options);
+    w3 = new ethers.providers.Web3Provider(provider);
+    ganacheAccounts = await w3.listAccounts();
+}
+
 
 async function connectWallet() {
-	const environmentSelect = document.getElementById('environment');
-	if (environmentSelect.value === 'metamask') {
-		if (window.ethereum) {
-			try {
-				await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const environmentSelect = document.getElementById('environment');
+    if (environmentSelect.value === 'metamask' || environmentSelect.value === 'paris') {
+        if (window.ethereum) {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
                 const account = await signer.getAddress();
-                const balance = await provider.getBalance(account);
+                const balance = await provider.getBalance(account);               
                 const formattedBalance = parseFloat(ethers.utils.formatEther(balance)).toFixed(4);
-                userAddress = account;
+                const formatAccount = account.slice(0, 6) + "..." + account.slice(38, 42) + " (" + formattedBalance + " ether" + ")";
 
-                const formatAccount = account.substring(0, 6) + "..." + account.substring(account.length - 4) + " (" + formattedBalance + " ether" + ")";
-                document.getElementById("account").value = formatAccount;
+                const accountSelect = document.getElementById('account'); 
+                accountSelect.innerHTML = '';
 
-				console.log('Connected to MetaMask.');
+                const option = document.createElement('option');
+                option.textContent = formatAccount;
+                accountSelect.appendChild(option);
+
+                console.log('Connected to MetaMask.');
                 console.log("balance: ", formattedBalance);
                 console.log(formatAccount)
 
-			} catch (error) {
-				console.error('User denied account access');
-			}
-		} else {
-			alert('MetaMask is not installed. Please consider installing it: https://metamask.io/');
-		}
-	}
+            } catch (error) {
+                console.error('User denied account access', error);
+            }
+
+        } else {
+            alert('MetaMask is not installed. Please consider installing it: https://metamask.io/');
+        };
+
+    } else if (environmentSelect.value === 'shanghai' || environmentSelect.value === 'istanbul' || environmentSelect.value == 'berlin') {
+
+        await ganacheProvider(environmentSelect.value);
+        updateAccountDisplay(ganacheAccounts, w3);
+
+    };
 }
+
+
+function updateAccountDisplay(accounts, w3) {
+    const accountSelect = document.getElementById('account'); 
+    accountSelect.innerHTML = ''; 
+
+    accounts.forEach(async account => {
+        const accountBalance = await w3.getBalance(account);
+        const formattedBalance = parseFloat(ethers.utils.formatEther(accountBalance)).toFixed(4);
+        const option = document.createElement('option');
+        option.value = account;
+        option.textContent = account.slice(0, 6) + "..." + account.slice(38, 42) + " (" + formattedBalance + " ether" + ")";
+        accountSelect.appendChild(option);
+    });
+}
+
 
 
 function displayConstructorParams(abi) {
@@ -71,7 +110,7 @@ function compileContract(code, version, environment) {
         evm_version: environment
     };
 
-    fetch('https://compile.vyperonline.com/vyper/compile', { 
+    fetch('http://127.0.0.1:8000/vyper/compile', { 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -105,11 +144,21 @@ function compileContract(code, version, environment) {
 }
 
 
-async function deployContract(abi, bytecode, constructorArgs, gasLimit, value) {
+async function deployContract(envVersion, abi, bytecode, constructorArgs, gasLimit, value) {
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
+    let provider = null;
+    let signer = null;
+
+    if (envVersion === "metamask" || envVersion === "paris") {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+    } else if (envVersion === 'shanghai' || envVersion === 'istanbul' || envVersion === 'berlin') {
+        provider = w3;
+        const account = document.getElementById("account").value;
+        const accountIndex = ganacheAccounts.findIndex(addr => addr.toLowerCase() === account.toLowerCase());
+        signer = provider.getSigner(accountIndex);
+    }
 
     const contractFactory = new ethers.ContractFactory(abi, bytecode, signer);
     const contract = await contractFactory.deploy(...constructorArgs, {gasLimit: gasLimit, value: value});
@@ -134,7 +183,7 @@ async function deployContract(abi, bytecode, constructorArgs, gasLimit, value) {
     `;
     document.body.appendChild(successModal);
     setTimeout(() => successModal.style.display = 'block', 100); 
-    setTimeout(() => successModal.style.display = 'none', 60000);
+    setTimeout(() => successModal.style.display = 'none', 5000);
 }
 
 
@@ -170,9 +219,11 @@ function closeModal() {
 }
 
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
 	const environmentSelect = document.getElementById('environment');
-	environmentSelect.addEventListener('change', connectWallet);
+    environmentSelect.addEventListener('change', connectWallet);
+    connectWallet();
+    
 });
 
 
@@ -204,7 +255,6 @@ document.getElementById('deployButton').addEventListener('click', async (event) 
     deployButton.innerHTML = '<img src="/statics/images/loading.svg" alt="Loading..." class="loading-indicator">';
     deployButton.disabled = true;
 
-
     const inputs = document.querySelectorAll('#constructorParams input');
     const constructorArgs = Array.from(inputs).map(input => input.value);
 
@@ -215,7 +265,10 @@ document.getElementById('deployButton').addEventListener('click', async (event) 
 
     value = ethers.utils.parseUnits(value, unit);
 
-    await deployContract(compiledAbi, compiledBytecode, constructorArgs, gasLimit, value)
+    const environmentSelect = document.getElementById('environment');
+    console.log(environmentSelect.value);
+
+    await deployContract(environmentSelect.value, compiledAbi, compiledBytecode, constructorArgs, gasLimit, value)
         .then(() => {
             deployButton.style.backgroundColor = 'yellow';
         })
@@ -227,5 +280,8 @@ document.getElementById('deployButton').addEventListener('click', async (event) 
     deployButton.disabled = false;
     document.getElementById('value').value = '';
 });
+
+
+
 
 

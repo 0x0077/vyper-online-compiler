@@ -20,7 +20,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/python-hint.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/addon/edit/matchbrackets.js"></script>
-	<script src="/statics/js/editor.js?v=1"></script>
+	<script src="/statics/js/editor.js?v=7"></script>
 </head>
 
 <body>
@@ -53,8 +53,8 @@
                         <select id="environment">
                             <option value="istanbul">Vyper VM (Istanbul)</option>
                             <option value="berlin">Vyper VM (Berlin)</option>
-                            <option value="paris" selected>Vyper VM (Paris)</option>
-                            <option value="shanghai">Vyper VM (Shanghai)</option>
+                            <option value="paris">Vyper VM (Paris)</option>
+                            <option value="shanghai" selected>Vyper VM (Shanghai)</option>
                             <option value="metamask">Injected provider (metamask)</option>
                         </select>
                     </div>
@@ -93,9 +93,7 @@
                 <div class="deploy-container">
                     <div class="account">
                         <label for="account">ACCOUNT</label>
-                        <div class="account-text">
-                            <input type="text" id="account" value="" readonly>
-                        </div>
+                        <select id="account" class="account-text"></select>
                     </div>
 
                     <div class="setting">
@@ -147,7 +145,8 @@
 	</div>
 
 	<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
-	<script src="/statics/js/script.js?v=5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ganache@7.9.1/dist/web/ganache.min.js"></script>
+	<script src="/statics/js/script.js?v=7"></script>
 
 </body>
 
