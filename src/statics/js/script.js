@@ -235,7 +235,7 @@ document.getElementById('compileButton').addEventListener('click', function() {
     document.getElementById('address').value = '...';
     document.getElementById('value').value = '';
 
-    var code = document.getElementById('codeInput').value;
+    var code = window.editor.getValue();
     var version = document.getElementById('version').value;
     var environment = document.getElementById('environment').value;
 

@@ -40,27 +40,29 @@ def __init__():
 		}
 	});
 
-	const ignore = ['', '#', '!', '-', '=', '@', '$', '%', '&', '+', ';', '(', ')', '*'];
-	const ignoreToken = (text) => {
-		if (text && text[0]) {
-			for (const pre in ignore) {
-				if (ignore[pre] === text[0]) {
-					return true;
-				}
-			}
-		} else {
-			return true;
-		}
-		return false;
-	};
+	window.editor = editor;
 
-	editor.on("change", function (editor, change) {
-		if (change.origin == "+input") {
-			var text = change.text;
-			if (!ignoreToken(text))
-				setTimeout(function () { editor.execCommand("autocomplete"); }, 20);
-		}
-	});
+	// const ignore = ['', '#', '!', '-', '=', '@', '$', '%', '&', '+', ';', '(', ')', '*'];
+	// const ignoreToken = (text) => {
+	// 	if (text && text[0]) {
+	// 		for (const pre in ignore) {
+	// 			if (ignore[pre] === text[0]) {
+	// 				return true;
+	// 			}
+	// 		}
+	// 	} else {
+	// 		return true;
+	// 	}
+	// 	return false;
+	// };
+
+	// editor.on("change", function (editor, change) {
+	// 	if (change.origin == "+input") {
+	// 		var text = change.text;
+	// 		if (!ignoreToken(text))
+	// 			setTimeout(function () { editor.execCommand("autocomplete"); }, 20);
+	// 	}
+	// });
 
 });
 
