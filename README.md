@@ -2,7 +2,8 @@
 ## Introduction
 Vyper Online is an online platform for compiling and deploying Vyper smart contracts. It provides a user-friendly interface, enabling users to easily compile and deploy Vyper contracts. Designed to offer a development experience similar to [Remix IDE](https://remix.ethereum.org/#lang=en&optimize=false&runs=200&evmVersion=null), but specifically focused on the Vyper language.
 
-This project is developed using the [Sanic](https://sanic.dev/en/) framework, a fast, asynchronous web server for Python.
+The project was developed using the [Sanic](https://sanic.dev/en/) framework, a fast, asynchronous web server for Python. 
+The frontend is developed with [PyScript](https://pyscript.net/), enabling users to create rich Python applications in the browser through an HTML interface, leveraging the capabilities of Pyodide, WASM, and modern web technologies.
 
 
 ## Features

@@ -1,0 +1,5 @@
+name = "Vyper Online"
+packages = []
+
+[js_modules.main]
+"https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.min.js" = "ethers"

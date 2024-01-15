@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vyper Online Compiler</title>
+    <link rel="icon" type="image/png" href="/assets/images/compiler-icon.png">
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <link rel="stylesheet" type="text/css" href="/assets/css/compiler.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/hint/show-hint.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/nord.min.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/ganache@7.9.1/dist/web/ganache.min.js"></script>
+
+    <script type="text/javascript">
+        async function initGanache(evm) {
+            const options = {hardfork: evm};
+            window.ganacheProvider = Ganache.provider(options);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log("Ganache loaded");
+            return window.ganacheProvider;
+        }
+
+
+    </script>
+    
+</head>
+
+<body>
+    <main class="main">
+        <section class="content">
+
+            <!-- files -->
+            <div class="files-sidebar">
+                <div class="files-header">
+                    <i class="fas fa-chevron-right icon" id="toggleIcon"></i>Files
+                    <span class="files-title"></span>
+                    <!-- <button class="add-file-btn">+</button> -->
+                </div>
+                <ul class="file-tree">
+                    <li class="folder">
+                        <div class="folder-name">examples</div>
+                        <ul class="nested">
+                            <li class="file" id="erc20File.vy">ERC20.vy</li>
+                            <li class="file" id="erc721File.vy">ERC721.vy</li>
+                        </ul>
+                    </li>
+                    <li class="file selected" id="contractFile.vy">contract.vy</li>
+                    <li class="file" id="readmeFile.md">README.md</li>
+                </ul>
+            </div>
+
+            <!-- editor -->
+            <div class="editor">
+                 <textarea id="codeInput" name="codeInput" placeholder="Enter your vyper code..."></textarea>
+            </div>
+
+            <!-- sidebar -->
+            <div class="deploy-sidebar" id="deploySidebar">
+                <div class="deploy-header">
+                    <span class="compile-title" id="compileTitle">Compile</span>
+                    <span class="deploy-title" id="deployTitle">Deploy</span>
+                </div>
+                <div class="compile-sidebar" id="compileSidebar">
+                    <div class="compile-setting">
+                        <label for="versionSelector">VYPER VERSION</label>
+                        <select class="custom-select" id="versionSelector">
+                            <option value="0.3.10">0.3.10+commit.9136169</option>
+                            <option value="0.3.9" selected>0.3.9+commit.66b9670</option>
+                            <option value="0.3.8">0.3.8+commit.036f153</option>
+                            <option value="0.3.7">0.3.7+commit.6020b8b</option>
+                            <option value="0.3.6">0.3.6+commit.4a2124d</option>
+                            <option value="0.3.5">0.3.5+commit.7bcfed1</option>
+                            <option value="0.3.4">0.3.4+commit.f31f0ec</option>
+                            <option value="0.3.3">0.3.3+commit.48e326f</option>
+                            <option value="0.3.2">0.3.2+commit.3b6a411</option>
+                            <option value="0.3.1">0.3.1+commit.0463ea4</option>
+                        </select>
+                    </div>
+                    
+                    <div class="compile-setting">
+                        <label for="evmVersionSelector">EVM VERSION</label>
+                        <select class="custom-select" id="evmVersionSelector">
+                            <option value="istanbul">Vyper VM (Istanbul)</option>
+                            <option value="berlin">Vyper VM (Berlin)</option>
+                            <option value="paris">Vyper VM (Paris)</option>
+                            <option value="shanghai" selected>Vyper VM (Shanghai)</option>
+                            <option value="metamask">Injected provider (metamask)</option>
+                        </select>
+                    </div>
+
+                    <button class="compile-btn">Compile</button>
+                    <div class="output-sidebar" id="outputSidebar">
+                        <div class="output-field" id="bytecodeOutputField"></div>
+                        <div class="output-field" id="abiOutputField"></div>
+                    </div>
+                </div>
+
+                <div class="deploy" style="display: none;">
+                    <div class="layer-one">
+                        <div class="deploy-setting" id="deployEvmVersion">
+                            <i class="fas fa-code-branch" id="gitIcon"></i>
+                            <select class="deploy-evm-version-select" id="deployEvmVersionSelector">
+                                <option value="istanbul">EVM - Istanbul</option>
+                                <option value="berlin">EVM - Berlin</option>
+                                <option value="paris">EVM - Paris</option>
+                                <option value="shanghai" selected>EVM - Shanghai</option>
+                                <option value="metamask">Injected provider - Metamask</option>
+                            </select>
+                        </div>
+                        <div class="eth-accounts">
+                            <i class="fas fa-wallet" id="walletIcon"></i>
+                            <select class="custom-account-select" id="customAccountSelect"></select>
+                        </div>
+                    </div>
+                    <div class="layer-two">
+                        <div class="network-status">
+                            <i class="fas fa-circle" id="netId"></i> 
+                            <span class="custom-network"></span>
+                        </div>
+                        <div class="account-balance">
+                            <span class="custom-balance"></span>
+                        </div>
+                    </div>
+                    <hr style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" id="dividerLine" SIZE=1>
+
+                    <div class="layer-three">
+                        <label>Constructor</label>
+                        <div class="constructor-sidebar" id="constructorSidebar">
+                            <span id="defaultConstructorText">No compiled contracts</span>
+                        </div>
+                        <div class="constructor-params-list" id="constructorParamsList"></div>
+                        <hr style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" id="dividerLine" SIZE=1>
+                    </div>
+
+                    <div class="layer-four">
+                        <label>Deployed contract</label>
+                        <div class="deploy-action">
+                            <div class="value-text">
+                                <input type="text" name="sendValue" placeholder="Value to send">
+                                <select id="etherUnit">
+                                    <option value="wei">Wei</option>
+                                    <option value="gwei">Gwei</option>
+                                    <option value="finney">Finney</option>
+                                    <option value="ether">Ether</option>
+                                </select>
+                            </div>
+                            <div class="mode-and-deploy">
+                                <button class="advance-mode-btn">
+                                    <div class="advance-mode-text">Advance Mode</div>
+                                </button>
+                                <button class="deploy-contract-btn">
+                                    <i class="fas fa-play" id="runIcon"></i>
+                                    <div class="deploy-contract-text">Deploy</div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layer-five" id="layerFive" style="visibility: hidden;">
+                        <label id="deployNetwork"></label>
+                        <div class="contract-card">
+                            <div class="contract-card-default" id="contractCardDefault">
+                                <div class="deployed-contract-name-default">
+                                    <span id="deployedContractName"></span><i class="fas fa-chevron-right icon" id="openCardIcon"></i>
+                                </div>
+                                <div class="close-deployed_contract">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                            </div>
+                            <div class="collapse-content" id="collapseContent" style="visibility: hidden;">
+                                <div class="function-names-sidebar" id="functionNamesSidebar"></div>
+                                <div class="function-run-sidebar" id="runFunctionsSidebar">
+                                    <div class="rf-1">
+                                        <button class="run-function-btn">
+                                            <i class="fas fa-play" id="runFnIcon"></i>Run
+                                        </button>
+                                        <div class="fn-type">
+                                            <i id="fnTypeIcon"></i>
+                                            <span class="function-type-content"></span>
+                                            <i class="fas fa-circle" id="simplePoint"></i>
+                                            <span class="function-type"></span>
+                                        </div>
+                                    </div>
+                                    <div class="rf-2">
+                                        <span class="gas-note">Requires gas</span>
+                                    </div>
+                                    <div class="rf-3 function-inputs" id="functionInputs">
+                                        <div class="default-input-text" id="defaultInputText">No inputs</div>
+                                    </div>
+                                    <hr style="FILTER: alpha(opacity=100,finishopacity=0,style=3)" id="fnLine" SIZE=1>
+                                    <div class="rf-4 response-output" id="resultOutput">
+                                        <label>Last Output</label>
+                                        <div class="functions-response">
+                                            <div id="functionsResponse">Output will appear here after running</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            
+
+        </section>
+
+    </main>
+
+    <script src="/assets/script/editor.js?v=1.1"></script>
+    <script type="py" src="/assets/script/compiler.py?v=1.1" config="/assets/script/pyscript.toml"></script>
+
+</body>
+</html>
+
+

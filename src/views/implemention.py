@@ -21,16 +21,14 @@ def switch_env_compiler(version, script_path, code, evm_version):
             tmpfile.flush()
             tmpfile_path = tmpfile.name
 
-        # /home/djuser/anaconda3/condabin/conda
-        command = ["conda", "run", "-n", env_name, "python", script_path, tmpfile_path, evm_version]
+        command = ["/Users/USERNAME/anaconda3/bin/conda", "run", "-n", env_name, "python", script_path, tmpfile_path, evm_version]
         result = subprocess.run(command, capture_output=True, text=True)
 
         if result.returncode == 0:
-            # print(result.stdout)
+            print(result.stdout)
             return file_json.loads(result.stdout)
         else:
             raise Exception(f"Error compiling Vyper code: {result.stderr}")
-    
     
     finally:
         os.remove(tmpfile_path)
@@ -52,7 +50,7 @@ async def compile_vyper_code(request):
     evm_version = evm_version if evm_version in evm_versions["evm_version"] else "shanghai"
   
     if not code:
-        return json({"error": "No code provided"})
+        return json({"error": "No code provided", "code": code})
 
     try:
         script_path = "./views/vyper_compiler.py"
@@ -68,7 +66,7 @@ async def compile_vyper_code(request):
                 "abi": str(compiled_code["abi"])
             }
         }
-
+    
 
     except Exception as e:
         err_name = str(e.__class__.__name__)

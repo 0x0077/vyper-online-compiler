@@ -15,17 +15,23 @@ name: public(String[12])
 
 @payable
 @external
-def __init__():
+def __init__(_a: address, _b: address):
 	self.owner = msg.sender
 	self.name = "Hello Vyper!"
+
+
+@view
+@external
+def test_add(_x: uint256, _y: uint256) -> uint256:
+	return _x + _y
 	`;
 
 	codeInput.value = defaultCode.trim();
 
 	var editor = CodeMirror.fromTextArea(codeInput, {
 		lineNumbers: true,
-		mode: "python",
-		theme: "default",
+		mode: "python",	
+		theme: "nord",
 		indentUnit: 4,
 		tabSize: 4,
 		indentWithTabs: true,

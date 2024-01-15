@@ -1,153 +1,256 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Vyper Online Compiler</title>
-    <link rel="icon" type="image/png" href="/statics/images/icon.png">
-	<link rel="stylesheet" type="text/css" href="/statics/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+        <title>OpenVy | Exploring and Utilizing the Vyper language</title>
+        <meta name="description" content="OpenVy">
+        <meta name="author" content="0x77">
+        <meta property="og:title" content="OpenVy">
+        <meta property="og:type" content="website">
+        <meta property="og:description" content="Your Premier Resource Hub for Vyper.">
+        <meta property="og:image" content="/assets/images/openvy-preview.png">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+        <link rel="icon" href="/assets/images/favicon.ico">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+        <link rel="stylesheet" href="/assets/css/main.css?v=1.1">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+    </head>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/python-hint.min.js"></script>
+    <body>
+        <main class="main">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/addon/edit/matchbrackets.js"></script>
-	<script src="/statics/js/editor.js?v=7"></script>
-</head>
-
-<body>
-	<div class="wrapper">
-        <div class="content">
-            <div class="editor">
-                <textarea id="codeInput" name="codeInput" placeholder="Enter your vyper code..."></textarea>
-            </div>
-
-            <div class="sidebar">
-                <div class="compile-section">
-                    <div class="compile-setting">
-                        <label for="version">VERSION</label>
-                        <select id="version">
-                            <option value="0.3.1">0.3.1</option>
-                            <option value="0.3.2">0.3.2</option>
-                            <option value="0.3.3">0.3.3</option>
-                            <option value="0.3.4">0.3.4</option>
-                            <option value="0.3.5">0.3.5</option>
-                            <option value="0.3.6">0.3.6</option>
-                            <option value="0.3.7">0.3.7</option>
-                            <option value="0.3.8">0.3.8</option>
-                            <option value="0.3.9" selected>0.3.9</option>
-                            <option value="0.3.10">0.3.10</option>
-                        </select>
-                    </div>
-
-                    <div class="compile-setting">
-                        <label for="environment">ENVIRONMENT</label>
-                        <select id="environment">
-                            <option value="istanbul">Vyper VM (Istanbul)</option>
-                            <option value="berlin">Vyper VM (Berlin)</option>
-                            <option value="paris">Vyper VM (Paris)</option>
-                            <option value="shanghai" selected>Vyper VM (Shanghai)</option>
-                            <option value="metamask">Injected provider (metamask)</option>
-                        </select>
-                    </div>
-
-                    <div class="compile-wrapper">
-                        <label for="compile-title">VYPER COMPILE</label>
-                        <button id="compileButton" class="compile-button">Compile</button>
-                    </div>
+            <!-- begin header -->
+            <header class="site-header">
+                <div class="logo">
+                    <img src="/assets/images/openvy-sticker.svg">
+                    <strong class="subhead">Your Premier Resource Hub for Vyper</strong>
                 </div>
+            </header>
+            <!-- end header -->
 
-                <div class="output-container">
-                    <div class="output-field">
-                        <label for="bytecode">BYTECODE</label>
-                        <div class="output-text">
-                            <input type="text" id="bytecodeOutput" value="..." readonly>
-                            <button onclick="copyToClipboard('bytecodeOutput')">Copy</button>
-                        </div>
+            <section class="content">
+
+                <!-- begin terminal window -->
+                <div class="terminal">
+                    <div class="menu">
+                        <div class="window-buttons close"></div>
+                        <div class="window-buttons minimize"></div>
+                        <div class="window-buttons zoom"></div>
                     </div>
+                    <div class="screen">
+                        <div class="code">
 
-                    <div class="output-field">
-                        <label for="abi">ABI</label>
-                        <div class="output-text">
-                            <input type="text" id="abiOutput" value="..." readonly>
-                            <button onclick="copyToClipboard('abiOutput')">Copy</button>
+                            <pre id="typewriter">
+                                Security...
+                                Simplicity...
+                                Transparency...
+                            </pre>
+
+                            <p class="line1"># @version 0.3.9<span class="cursor1">|</span></p>
+                            <p class="line2"><span class="cursor2">|</span></p>
+                            <p class="line3">
+                                greet: public(String[12])<br>
+                                <span class="cursor3">|</span>
+                            </p>
+
+                            <p class="line4">
+                                <span style="color:#FFD580;">
+                                    @payable<br>
+                                    @external<br>
+                                </span>
+                                def __init__():<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;self.greet = <span style="color:#BAE67E;">"Hello Vyper!"</span><br>
+                                <span class="cursor4">|</span>
+                            </p>
+
+                            <p class="line5"><span class="cursor5">|</span></p>
+
                         </div>
                     </div>
                 </div>
+                <!-- end terminal window -->
 
-                <div class="constructor-container">
-                    <label>CONSTRUCTOR</label>
-                    <div id="constructorParamsContainer" style="background-color: #f2f2f2; padding: 10px;">
-                        <div id="constructorParams"></div>
-                    </div>
+                <div class="dialogs">
+                    <!-- begin examples badge -->
+                    <a href="https://github.com/0x0077/WTF-Vyper" target="_blank" rel="noreferrer noopener" class="examples-block">
+                        <div class="glyph">
+                            <svg width="16px" height="16px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-grid">
+                            <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Examples</h2>
+                            <p><span>Click here</span> for example projects</p>
+                        </div>
+                    </a>
+                    <!-- end examples badge -->
+
+                    <!-- begin compiler badge -->
+                    <a href="http://127.0.0.1:8000/compiler" target="_blank" rel="noreferrer noopener" class="examples-block">
+                        <div class="glyph">
+                            <svg id="pyscript-logo-icon" width="16px" height="16px" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 165 155">
+                            <path d="M155.621 28.601C132.42-5.336 76.466-5.723 42.438 10.485-8.056 34.533-1.18 86.205 2.62 135.64c.295 3.812.605 7.706 2.147 11.203 1.538 3.498 4.56 6.59 8.346 7.145a8.704 8.704 0 0 0 4.41-.483c4.691-1.763 8.173-7.285 9.972-12.386 9.366-26.575 22.345-13.358 43.588-9.822 2.849.474 5.716.865 8.584 1.165l6.136-16.054-23.68-59.474a15.412 15.412 0 0 1 14.333-21.106c6.818 0 12.974 4.295 15.314 10.691l10.615 28.957 9.613-28.817a15.834 15.834 0 0 1 15.044-10.83 14.78 14.78 0 0 1 12.069 6.255 14.756 14.756 0 0 1 1.833 13.46l-26.398 73.734c24.295-8.256 43.956-29.783 49.092-55.01 3.167-15.556.933-32.551-8.027-45.662l.009-.005Z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Vyper Online Compiler</h2>
+                            <p>Compiles <span>Vyper</span> source code</p>
+                        </div>
+                    </a>
+                    <!-- end compiler badge -->
                 </div>
 
-                <div class="deploy-container">
-                    <div class="account">
-                        <label for="account">ACCOUNT</label>
-                        <select id="account" class="account-text"></select>
-                    </div>
+                <!-- begin dialog content -->
+                <div class="dialogs">
 
-                    <div class="setting">
-                        <label for="gasLimit">GAS LIMIT</label>
-                        <div class="gas-limit-text">
-                            <input type="text" id="gasLimit" value="3000000">
+                    <!-- begin documentation dropdown -->
+                    <a href="https://docs.vyperlang.org/en/latest/" target="_blank" rel="noreferrer noopener" class="dialog" tabindex="1">
+                        <div class="glyph">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M448 336v-288C448 21.49 426.5 0 400 0H96C42.98 0 0 42.98 0 96v320c0 53.02 42.98 96 96 96h320c17.67 0 32-14.33 32-31.1c0-11.72-6.607-21.52-16-27.1v-81.36C441.8 362.8 448 350.2 448 336zM143.1 128h192C344.8 128 352 135.2 352 144C352 152.8 344.8 160 336 160H143.1C135.2 160 128 152.8 128 144C128 135.2 135.2 128 143.1 128zM143.1 192h192C344.8 192 352 199.2 352 208C352 216.8 344.8 224 336 224H143.1C135.2 224 128 216.8 128 208C128 199.2 135.2 192 143.1 192zM384 448H96c-17.67 0-32-14.33-32-32c0-17.67 14.33-32 32-32h288V448z"/></svg>
+                        </div>
+
+                        <div>
+                            <h2>Documentation</h2>
+                            <p>Click here for Vyper documentation</p>
+                        </div>
+                    </a>
+                    <!-- end documentation dropdown -->
+
+                    <!-- begin installation dropdown -->
+                    <div class="dialog dropdown" tabindex="2">
+                        <div class="glyph">
+                            <svg width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="none" stroke="#fff" stroke-width="2" d="M9,22 L15,2 M17,17 L22,12 L17,7 M7,17 L2,12 L7,7"/>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <h2>Install</h2>
+                            <p>Click here for instructions</p>
+                        </div>
+
+                        <div class="dropdown-content">
+                            <i class="close" tabindex="2"></i>
+                            <div class="inner">
+                                <p style="font-size:1.15rem;padding-bottom: 0;">Vyper can only be built using Python 3.6 and higher.</p>
+
+                                <p>To use Vyper you can either <a href="https://docs.vyperlang.org/en/latest/installing-vyper.html">install</a> it and follow the instructions, or can be installed using pip.</p>
+                                <code class="pre">
+                                    pip install vyper<br>
+                                    pip install vyper==0.3.9
+                                </code>
+                                <p>Click <a href="https://docs.vyperlang.org/en/latest/" target="_blank">here</a> for more info on how to use Vyper.</p>
+                            </div>
                         </div>
                     </div>
+                    <!-- end installation dropdown -->
 
-                    <div class="setting">
-                        <label for="value">VALUE</label>
-                        <div class="value-text">
-                            <input type="text" id="value" placeholder="0">
-                            <select id="unit">
-                                <option value="wei">Wei</option>
-                                <option value="gwei">Gwei</option>
-                                <option value="finney">Finney</option>
-                                <option value="ether">Ether</option>
-                            </select>
+                </div>
+                <!-- end dialog content -->
+
+                <footer class="site-footer">
+                    <a href="https://github.com/0x0077/" class="footer-button" target="_blank">
+                        <div class="icon">
+                            <svg width="1024px" height="1024px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" class="icon">
+                            <path d="M511.6 76.3C264.3 76.2 64 276.4 64 523.5 64 718.9 189.3 885 363.8 946c23.5 5.9 19.9-10.8 19.9-22.2v-77.5c-135.7 15.9-141.2-73.9-150.3-88.9C215 726 171.5 718 184.5 703c30.9-15.9 62.4 4 98.9 57.9 26.4 39.1 77.9 32.5 104 26 5.7-23.5 17.9-44.5 34.7-60.8-140.6-25.2-199.2-111-199.2-213 0-49.5 16.3-95 48.3-131.7-20.4-60.5 1.9-112.3 4.9-120 58.1-5.2 118.5 41.6 123.2 45.3 33-8.9 70.7-13.6 112.9-13.6 42.4 0 80.2 4.9 113.5 13.9 11.3-8.6 67.3-48.8 121.3-43.9 2.9 7.7 24.7 58.3 5.5 118 32.4 36.8 48.9 82.7 48.9 132.3 0 102.2-59 188.1-200 212.9a127.5 127.5 0 0 1 38.1 91v112.5c.8 9 0 17.9 15 17.9 177.1-59.7 304.6-227 304.6-424.1 0-247.2-200.4-447.3-447.5-447.3z"/>
+                            </svg>
                         </div>
-                    </div>
-                    <button id="deployButton" class="deploy-button">Deploy</button>
-                </div>
-
-                <div class="contract-container">
-                    <div class="contract-address">
-                        <label for="contract-address">CONTRACT ADDRESS</label>
-                        <div class="contract-address-text">
-                            <input type="text" id="address" value="..." readonly>
-                            <button onclick="copyToClipboard('address')">Copy</button>
+                        <div>
+                            <span>Project home</span>
                         </div>
+                    </a>
+
+                    <div class="copyright">
+                        <p>Power by <a href="https://github.com/0x0077/" target="_blank">@0x77</a> &#10084;
                     </div>
-                </div>
+                </footer>
 
-                <div id="errorModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close-button" onclick="closeModal()">&times;</span>
-                        <p id="errorText"></p>
-                    </div>
-                </div>
+            </section>
+        </main>
 
-            </div>
-        </div>
+        <script>
+            // Typing animation
+            function setupTypewriter(t) {
+                var HTML = t.innerHTML;
 
-        <div class="footer">
-            Power by <a href="https://github.com/0x0077" target="_blank" rel="noopener noreferrer">@0x77</a> ❤️
-        </div>
+                t.innerHTML = '';
 
-	</div>
+                var cursorPosition = 0,
+                    tag = '',
+                    writingTag = false,
+                    tagOpen = false,
+                    typeSpeed = 100,
+                    tempTypeSpeed = 0;
 
-	<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ganache@7.9.1/dist/web/ganache.min.js"></script>
-	<script src="/statics/js/script.js?v=7"></script>
+                var type = function() {
 
-</body>
+                    if (writingTag === true) {
+                        tag += HTML[cursorPosition];
+                    }
 
+                    if (HTML[cursorPosition] === '<') {
+                        tempTypeSpeed = 0;
+                        if (tagOpen) {
+                            tagOpen = false;
+                            writingTag = true;
+                        } else {
+                            tag = '';
+                            tagOpen = true;
+                            writingTag = true;
+                            tag += HTML[cursorPosition];
+                        }
+                    }
+                    if (!writingTag && tagOpen) {
+                        tag.innerHTML += HTML[cursorPosition];
+                    }
+                    if (!writingTag && !tagOpen) {
+                        if (HTML[cursorPosition] === ' ') {
+                            tempTypeSpeed = 0;
+                        }
+                        else {
+                            tempTypeSpeed = (Math.random() * typeSpeed) + 50;
+                        }
+                        t.innerHTML += HTML[cursorPosition];
+                    }
+                    if (writingTag === true && HTML[cursorPosition] === '>') {
+                        tempTypeSpeed = (Math.random() * typeSpeed) + 50;
+                        writingTag = false;
+                        if (tagOpen) {
+                            var newSpan = document.createElement('span');
+                            t.appendChild(newSpan);
+                            newSpan.innerHTML = tag;
+                            tag = newSpan.firstChild;
+                        }
+                    }
+
+                    cursorPosition += 1;
+                    if (cursorPosition < HTML.length - 1) {
+                        setTimeout(type, tempTypeSpeed);
+                    }
+                };
+
+                return {
+                    type: type
+                };
+            }
+
+            let typer = document.getElementById('typewriter');
+
+            typewriter = setupTypewriter(typewriter);
+
+            typewriter.type();
+        </script>
+
+        <!-- BEGIN HEAP INTEGRATION -->
+        <script type="text/javascript">
+            window.heap=window.heap||[],heap.load=function(e,t){window.heap.appid=e,window.heap.config=t=t||{};var r=document.createElement("script");r.type="text/javascript",r.async=!0,r.src="https://cdn.heapanalytics.com/js/heap-"+e+".js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(r,a);for(var n=function(e){return function(){heap.push([e].concat(Array.prototype.slice.call(arguments,0)))}},p=["addEventProperties","addUserProperties","clearEventProperties","identify","resetIdentity","removeEventProperty","setEventProperties","track","unsetEventProperty"],o=0;o<p.length;o++)heap[p[o]]=n(p[o])};
+            heap.load("758475466");
+        </script>
+        <!-- END HEAP INTEGRATION -->
+    </body>
 </html>

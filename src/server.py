@@ -2,23 +2,29 @@ from sanic import Sanic
 from sanic_cors import CORS
 from sanic.response import text, html
 from views.implemention import imp
-from views.test import ts
 
 
 app = Sanic(__name__)
-app.static('/statics', './statics')
+app.static('/assets', './assets')
 
+app.config.FORWARDED_SECRET = "YOUR_SANIC_FORWARDED_SECRET"
 app.config['CORS_AUTOMATIC_OPTIONS'] = True
 
 CORS(app)
 
 app.blueprint(imp)
-app.blueprint(ts)
 
 
 @app.route("/")
 async def index(request):
     with open("templates/index.html", "r") as f:
+        html_content = f.read()
+    return html(html_content)
+
+
+@app.route("/compiler")
+async def compiler(request):
+    with open("templates/compiler.html", "r") as f:
         html_content = f.read()
     return html(html_content)
 
