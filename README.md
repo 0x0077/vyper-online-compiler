@@ -12,7 +12,7 @@ The frontend is developed with [PyScript](https://pyscript.net/), enabling users
 
 
 ## How to Use
-Visit [Vyper Online Compiler](https://compile.vyperonline.com) to start. The site is intuitive to use, and you can write and test your smart contracts directly in your browser.
+Visit [Vyper Online Compiler](https://www.vyperonline.com) to start. The site is intuitive to use, and you can write and test your smart contracts directly in your browser.
 
 
 ## How to Contribute
@@ -31,7 +31,7 @@ If you encounter any issues while using the platform, or if you have suggestions
 
 
 ## Links
-- Project Homepage: [Vyper Online](https://compile.vyperonline.com)
+- Project Homepage: [Vyper Online](https://www.vyperonline.com)
 - Issue Tracking: [GitHub Issues](https://github.com/0x0077/vyper-online-compiler/issues)
 
 
