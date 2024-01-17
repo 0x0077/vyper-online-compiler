@@ -170,21 +170,6 @@ async def deploy_contract(event):
         display_function_params(abi)
 
 
-@when("click", ".run-function-btn")
-async def call_contract(event):
-    account_select = document.querySelector("#customAccountSelect")
-    acc_index = account_list.index(account_select.value)
-    singer = await ganache_connect.getSigner(acc_index)
-
-    contract = ethers.Contract.new(caddr, abi, singer)
-
-    window.console.log(await contract.owner())
-    window.console.log(await contract.x())
-
-    tx = await contract.set_x(100)
-    await tx.wait()
-    window.console.log(await contract.x())
-
 
 @when("click", ".compile-btn")
 async def compile_code(event):
@@ -369,16 +354,22 @@ def display_function_params(abi):
         fn_state = list(func.values())[0]["type"]
         fn_params = list(func.values())[0]["params"]
 
-        func_name_list_element = pydom.create("div", classes=["fname-list"])
+        if y == 0:
+            func_name_list_element = pydom.create("li", classes=["fname-list", "selected"])
+        else:
+            func_name_list_element = pydom.create("li", classes=["fname-list"])
+
         pydom["#functionNamesSidebar"][0].append(func_name_list_element)
-        func_name_list_element.id = "fnameList" + str(y)
+        func_name_list_element.id = "fnameList" + str(fn)
+
         func_name_element = pydom.create("span", classes=["fname"], html=fn)
         icon_type, func_type = ("fa-eye", "read") if fn_state == "view" else ("fa-pencil-alt", "write")
+        func_name_list_element.style["cursor"] = "pointer"
 
         icon_element = pydom.create("i", classes=["fas", icon_type])
-        pydom[f"#fnameList{y}"][0].append(func_name_element)
-        pydom[f"#fnameList{y}"][0].append(icon_element)
-        icon_element.id = "fnameIcon"
+        pydom[f"#fnameList{str(fn)}"][0].append(func_name_element)
+        pydom[f"#fnameList{str(fn)}"][0].append(icon_element)
+        icon_element.id = "fnameIcon" + str(fn)
 
         if y == 0:
             fns = document.querySelector("#functionNamesSidebar")
@@ -417,6 +408,102 @@ def display_function_params(abi):
                 k += 1
 
         y += 1
+
+
+@when("click", "#functionNamesSidebar")
+def change_function(event):
+    
+    fname = event.target.innerText
+    fn_params = next(item[fname] for item in function_list if fname in item)
+
+    fns = document.querySelector("#functionNamesSidebar")
+    fns.value = fname
+
+    new_fname_list_element = document.querySelector(f"#fnameList{fname}")
+    fname_list_element = document.querySelectorAll(".fname-list")
+
+    for fle in fname_list_element:
+        fle.classList.remove("selected")
+
+    if new_fname_list_element:
+        new_fname_list_element.classList.add("selected")
+
+
+    fn_state = fn_params["type"]
+    icon_type, func_type = ("fa-eye", "read") if fn_state == "view" else ("fa-pencil-alt", "write")
+    
+    icon_element = document.querySelector("#fnTypeIcon")
+    icon_element.className = ""
+    icon_element.classList.add("fa", icon_type)
+
+    ftype_content = document.querySelector(".function-type-content")
+    ftype_content.innerText = func_type
+
+    k = 0
+
+    fn_input_element = document.querySelector("#functionInputs")
+    fn_input_element.innerHTML = '<div class="default-input-text" id="defaultInputText">No inputs</div>'
+
+    for param_input in fn_params["params"]:
+        pydom["#defaultInputText"][0].style["display"] = "none"
+        fn_input_element = pydom.create("div", classes=["fn-input"])
+        pydom["#functionInputs"][0].append(fn_input_element)
+        fn_input_element.id = "fnInput" + str(k)
+
+        param_name = param_input["name"]
+        param_type = param_input["type"]
+
+        fn_input_label = pydom.create("label", classes=["fn-input-label"], html=f"{param_name}:")
+        fn_input_text = pydom.create("input", classes=["fn-input-text"])
+        
+        pydom[f"#fnInput{k}"][0].append(fn_input_label)
+        pydom[f"#fnInput{k}"][0].append(fn_input_text)
+
+        fntid = str(param_name) + "DisplayParamInputText"
+        fn_input_text.id = fntid
+        fn_input_text_element = document.querySelector(f"#{fntid}")
+        fn_input_text_element.placeholder = param_type
+        k += 1
+
+
+@when("click", ".run-function-btn")
+async def call_contract(event):
+
+    account_select = document.querySelector("#customAccountSelect")
+    acc_index = account_list.index(account_select.value)
+    singer = await ganache_connect.getSigner(acc_index)
+
+    fns_element = document.querySelector("#functionNamesSidebar")
+    func_name = fns_element.value
+
+    fn_params = next(item[func_name] for item in function_list if func_name in item)
+    func_type = fn_params["type"]
+    method_types = ",".join([param["type"] for param in fn_params["params"]])
+    method_id = f"{func_name}({method_types})"
+    window.console.log(str(method_id))
+    params = []
+
+    for param_input in fn_params["params"]:
+        param_name = param_input["name"]
+        fntid = str(param_name) + "DisplayParamInputText"
+        fn_input_text_element = document.querySelector(f"#{fntid}")
+        params.append(fn_input_text_element.value)
+        
+    contract = ethers.Contract.new(caddr, abi, singer)
+    
+    if func_type == "view":
+        res = await getattr(contract, method_id)(*params)
+        output_element = document.querySelector("#functionsResponse")
+        output_element.innerText = res
+    
+    else:
+        tx = await getattr(contract, method_id)(*params)
+        await tx.wait()
+
+
+
+
+
 
 
 
@@ -501,7 +588,7 @@ def copy_abi_output(event):
 
 
 @when("click", "#deployTitle")
-def a(event):
+def open_deploy_title(event):
     compile_element = document.querySelector(".compile-sidebar")
     compile_element.style.display = "none"
 
@@ -515,7 +602,7 @@ def a(event):
 
 
 @when("click", "#compileTitle")
-def a(event):
+def open_compile_title(event):
     compile_element = document.querySelector(".compile-sidebar")
     compile_element.style.display = "block"
 
