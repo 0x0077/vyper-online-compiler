@@ -11,6 +11,7 @@ import asyncio
 file_code_dict = defaultdict(lambda: "default")
 function_list = []
 account_list = []
+contract_list = []
 example_files_data = [
     "ERC20.vy",
     "ERC721.vy",
@@ -39,6 +40,11 @@ ganache_connect = None
 ethers_connect = None
 is_constructor = None
 deploy_network = None
+caddr = None
+deploy_count = 0
+
+default_function_html = document.querySelector(".contract-card").innerHTML
+default_function_run_html = document.querySelector(".function-run-sidebar").innerHTML
 
 
 async def ganache_provider(evm):
@@ -127,11 +133,12 @@ async def connect_wallet(event):
         await ganache_provider(evm)
 
 
-caddr = None
 
 @when("click", ".deploy-contract-btn")
 async def deploy_contract(event):
     global caddr
+    global contract_list
+    global deploy_count
 
     evm_select = document.querySelector(".custom-network")
     account_select = document.querySelector("#customAccountSelect")
@@ -157,18 +164,21 @@ async def deploy_contract(event):
         contract = await factory.deploy(*pml, gasLimit=gas_limit, value=value)
         window.console.log(f"Contract Address: {contract.target}")
         caddr = contract.target
+        contract_list.append(contract.target)
 
         await contract.waitForDeployment()
         window.console.log("Deployed!!!")
         
-        # contract_file_name = document.
         dnet = document.querySelector("#deployNetwork")
         dnet.innerText = deploy_network
-        cname = document.querySelector("#deployedContractName")
+        cname = document.querySelector(".deployed-contract-name")
         cname.innerText = last_click_file_name
 
         display_function_params(abi)
+        cpl = document.querySelector("#constructorParamsList")
+        cpl.innerHTML = ""
 
+    deploy_count += 1
 
 
 @when("click", ".compile-btn")
@@ -199,8 +209,12 @@ async def compile_code(event):
             bytecode = data["Data"]["bytecode"]
             abi = data["Data"]["abi"].replace("'", "\"")
 
+            error_element = document.querySelector(".error-post")
+            if error_element:
+                error_element.style.display = "none"
+
             if not pydom["#bytecodeOutputField"][0].html:
-                
+
                 # create output sidebar element
                 bytecode_output_text = pydom.create("div", classes=["output-text"])
                 bytecode_label = pydom.create("label", classes=["bytecode-label"], html="Bytecode")
@@ -245,8 +259,7 @@ async def compile_code(event):
 
                 abi_label.style["display"] = "block"
                 abi_output.style["display"] = "block"
-
-                
+                pydom["#outputSidebar"][0].style["display"] = "block"
 
             else:
                 bytecode_element = document.querySelector("#bytecodeOutput")
@@ -260,7 +273,10 @@ async def compile_code(event):
                 display_constructor_params(abi)
 
         else:
+
+            pydom["#outputSidebar"][0].style["display"] = "none"
             post_error(data["Msg"])
+
     else:
         window.console.log("error")
 
@@ -313,7 +329,8 @@ def display_function_params(abi):
     types = [t["type"] for t in abi]
 
     pydom["#layerFive"][0].style["visibility"] = "visible"
-    pydom["#collapseContent"][0].style["visibility"] = "visible"
+    collapse_element = document.querySelector(".collapse-content")
+    collapse_element.style.visibility = "visible"
 
     x = 0
     func_write_list = []
@@ -347,6 +364,10 @@ def display_function_params(abi):
     func_list = func_write_list + func_read_list
     function_list = func_list
 
+    fn_sidebar = document.querySelector(".function-names-sidebar")
+    fn_sidebar_id = "functionNamesSidebar" + str(deploy_count)
+    fn_sidebar.id = fn_sidebar_id
+
     y = 0
 
     for func in func_list:
@@ -354,117 +375,123 @@ def display_function_params(abi):
         fn_state = list(func.values())[0]["type"]
         fn_params = list(func.values())[0]["params"]
 
+        fn_type_icon = "fnTypeIcon" + str(fn) + str(y)
+        fn_type_content = "functionTypeContent" + str(fn) + str(y)
+        fn_type = "functionType" + str(fn) + str(y)
+        default_fn_text_id = "defaultInputText" + str(fn) + str(y)
+        fn_inputs_id = "functionInputs" + str(fn) + str(y)
+
         if y == 0:
+            fn_sidebar.value = fn
             func_name_list_element = pydom.create("li", classes=["fname-list", "selected"])
+            fn_run_element = document.querySelector(".function-run-sidebar")
+            fn_run_element.id = "functionRunSidebar" + str(fn) + str(y)
+            document.querySelector(".fn-type-icon").id = fn_type_icon
+            document.querySelector(".function-type-content").id = fn_type_content
+            document.querySelector(".function-type").id = fn_type
+            document.querySelector(".run-function-btn").id = "runFuntionBtn" + str(fn) + str(y)
+            document.querySelector(".function-inputs").id = fn_inputs_id
+            document.querySelector(".default-input-text").id = default_fn_text_id
+            document.querySelector(".functions-response-text").id = "functionsResponse" + str(fn) + str(y)
+            fn_run_element.style.display = "block"
+
         else:
             func_name_list_element = pydom.create("li", classes=["fname-list"])
+            fn_run_element = document.querySelector(".function-run-sidebar")
+            new_run_element = fn_run_element.cloneNode("true")
+            new_run_element.querySelector(".fn-type-icon").id = fn_type_icon
+            new_run_element.querySelector(".function-type-content").id = fn_type_content
+            new_run_element.querySelector(".function-type").id = fn_type
+            new_run_element.querySelector(".run-function-btn").id = "runFuntionBtn" + str(fn) + str(y)
+            new_run_element.querySelector(".function-inputs").id = fn_inputs_id
+            new_run_element.querySelector(".default-input-text").id = default_fn_text_id
+            new_run_element.querySelector(".functions-response-text").id = "functionsResponse" + str(fn) + str(y)
+            new_run_element.id = "functionRunSidebar" + str(fn) + str(y)
+            
+            pydom["#collapseContent"][0].append(new_run_element)
+            new_run_element.style.display = "none"
 
-        pydom["#functionNamesSidebar"][0].append(func_name_list_element)
-        func_name_list_element.id = "fnameList" + str(fn)
+
+        pydom[f"#{fn_sidebar_id}"][0].append(func_name_list_element)
+        func_name_list_element.id = "fnameList" + str(fn) + str(y)
 
         func_name_element = pydom.create("span", classes=["fname"], html=fn)
         icon_type, func_type = ("fa-eye", "read") if fn_state == "view" else ("fa-pencil-alt", "write")
         func_name_list_element.style["cursor"] = "pointer"
 
         icon_element = pydom.create("i", classes=["fas", icon_type])
-        pydom[f"#fnameList{str(fn)}"][0].append(func_name_element)
-        pydom[f"#fnameList{str(fn)}"][0].append(icon_element)
+        pydom[f"#fnameList{str(fn)}{str(y)}"][0].append(func_name_element)
+        pydom[f"#fnameList{str(fn)}{str(y)}"][0].append(icon_element)
         icon_element.id = "fnameIcon" + str(fn)
+        func_name_element.id = "fname" + str(fn) + str(y)
 
-        if y == 0:
-            fns = document.querySelector("#functionNamesSidebar")
-            fns.value = fn
+        icon_element = document.querySelector(f"#{fn_type_icon}")
+        icon_element.classList.add("fa", icon_type)
+        
+        ftype_content = document.querySelector(f"#{fn_type_content}")
+        ftype_content.innerText = func_type
 
-            icon_element = document.querySelector("#fnTypeIcon")
-            icon_element.classList.add("fa", icon_type)
-            
-            ftype_content = document.querySelector(".function-type-content")
-            ftype_content.innerText = func_type
+        ftype = document.querySelector(f"#{fn_type}")
+        ftype.innerText = fn_state
 
-            ftype = document.querySelector(".function-type")
-            ftype.innerText = fn_state
-            
-            k = 0
+        k = 0
 
-            for param_input in fn_params:
-                pydom["#defaultInputText"][0].style["display"] = "none"
-                fn_input_element = pydom.create("div", classes=["fn-input"])
-                pydom["#functionInputs"][0].append(fn_input_element)
-                fn_input_element.id = "fnInput" + str(k)
+        for param_input in fn_params:
+            pydom[f"#{default_fn_text_id}"][0].style["display"] = "none"
+            fn_input_element = pydom.create("div", classes=["fn-input"])
+            pydom[f"#{fn_inputs_id}"][0].append(fn_input_element)
+            fn_input_element.id = "fnInput" + str(fn) + str(k)
 
-                param_name = param_input["name"]
-                param_type = param_input["type"]
+            param_name = param_input["name"]
+            param_type = param_input["type"]
 
-                fn_input_label = pydom.create("label", classes=["fn-input-label"], html=f"{param_name}:")
-                fn_input_text = pydom.create("input", classes=["fn-input-text"])
-                
-                pydom[f"#fnInput{k}"][0].append(fn_input_label)
-                pydom[f"#fnInput{k}"][0].append(fn_input_text)
+            fn_input_label = pydom.create("label", classes=["fn-input-label"], html=f"{param_name}:")
+            fn_input_text = pydom.create("input", classes=["fn-input-text"])
 
-                fntid = str(param_name) + "DisplayParamInputText"
-                fn_input_text.id = fntid
-                fn_input_text_element = document.querySelector(f"#{fntid}")
-                fn_input_text_element.placeholder = param_type
-                k += 1
+            pydom[f"#fnInput{str(fn)}{str(k)}"][0].append(fn_input_label)
+            pydom[f"#fnInput{str(fn)}{str(k)}"][0].append(fn_input_text)
+
+            fntid = str(param_name) + "DisplayParamInputText" + str(fn)
+            fn_input_text.id = fntid
+            fn_input_text_element = document.querySelector(f"#{fntid}")
+            fn_input_text_element.placeholder = param_type
+            k += 1
 
         y += 1
 
 
-@when("click", "#functionNamesSidebar")
+
+@when("click", ".function-names-sidebar")
 def change_function(event):
-    
-    fname = event.target.innerText
-    fn_params = next(item[fname] for item in function_list if fname in item)
+    if event.target.classList.contains("fname-list") or event.target.classList.contains("fname"):
+        fname = event.target.innerText
+        fn_sidebar_id = event.target.id
 
-    fns = document.querySelector("#functionNamesSidebar")
-    fns.value = fname
+        if event.target.className == "fname":
+            id_len = len(fname) + len("fanme")
+        else:
+            id_len = len(fname) + len("fnameList")
+            
+        fn_number = str(fn_sidebar_id)[id_len:]
+        run_sidebar_id = "functionRunSidebar" + str(fname) + fn_number
+        fname_list_id = "fnameList" + str(fname) + fn_number
 
-    new_fname_list_element = document.querySelector(f"#fnameList{fname}")
-    fname_list_element = document.querySelectorAll(".fname-list")
+        all_fname_list_element = document.querySelectorAll(".fname-list")
+        for fle in all_fname_list_element:
+            if fle.id == fname_list_id:
+                fle.classList.add("selected")
+            else:
+                fle.classList.remove("selected")
 
-    for fle in fname_list_element:
-        fle.classList.remove("selected")
+        all_fn_run_sidebar = document.querySelectorAll(".function-run-sidebar")
 
-    if new_fname_list_element:
-        new_fname_list_element.classList.add("selected")
+        for fns in all_fn_run_sidebar:
+            if fns.id == run_sidebar_id:
+                fns.style.display = "block"
+            else:
+                fns.style.display = "none"
 
-
-    fn_state = fn_params["type"]
-    icon_type, func_type = ("fa-eye", "read") if fn_state == "view" else ("fa-pencil-alt", "write")
-    
-    icon_element = document.querySelector("#fnTypeIcon")
-    icon_element.className = ""
-    icon_element.classList.add("fa", icon_type)
-
-    ftype_content = document.querySelector(".function-type-content")
-    ftype_content.innerText = func_type
-
-    k = 0
-
-    fn_input_element = document.querySelector("#functionInputs")
-    fn_input_element.innerHTML = '<div class="default-input-text" id="defaultInputText">No inputs</div>'
-
-    for param_input in fn_params["params"]:
-        pydom["#defaultInputText"][0].style["display"] = "none"
-        fn_input_element = pydom.create("div", classes=["fn-input"])
-        pydom["#functionInputs"][0].append(fn_input_element)
-        fn_input_element.id = "fnInput" + str(k)
-
-        param_name = param_input["name"]
-        param_type = param_input["type"]
-
-        fn_input_label = pydom.create("label", classes=["fn-input-label"], html=f"{param_name}:")
-        fn_input_text = pydom.create("input", classes=["fn-input-text"])
         
-        pydom[f"#fnInput{k}"][0].append(fn_input_label)
-        pydom[f"#fnInput{k}"][0].append(fn_input_text)
-
-        fntid = str(param_name) + "DisplayParamInputText"
-        fn_input_text.id = fntid
-        fn_input_text_element = document.querySelector(f"#{fntid}")
-        fn_input_text_element.placeholder = param_type
-        k += 1
-
 
 @when("click", ".run-function-btn")
 async def call_contract(event):
@@ -473,7 +500,9 @@ async def call_contract(event):
     acc_index = account_list.index(account_select.value)
     singer = await ganache_connect.getSigner(acc_index)
 
-    fns_element = document.querySelector("#functionNamesSidebar")
+    button_id = event.target.id
+
+    fns_element = document.querySelector(f"#functionNamesSidebar{button_id[13:]}")
     func_name = fns_element.value
 
     fn_params = next(item[func_name] for item in function_list if func_name in item)
@@ -493,13 +522,12 @@ async def call_contract(event):
     
     if func_type == "view":
         res = await getattr(contract, method_id)(*params)
-        output_element = document.querySelector("#functionsResponse")
+        output_element = document.querySelector(f"#functionsResponse{button_id[13:]}")
         output_element.innerText = res
     
     else:
         tx = await getattr(contract, method_id)(*params)
         await tx.wait()
-
 
 
 
@@ -615,45 +643,43 @@ def open_compile_title(event):
     deploy_title_element.style.color = "white"
 
 
-@when("click", ".contract-card")
+@when("click", ".contract-card-default")
 def open_card(event):
-    contract_content = document.querySelector("#collapseContent")
-    card_icon_element = document.querySelector("#openCardIcon")
+    contract_content = document.querySelector(".collapse-content")
+    card_icon_element = document.querySelector(".open-card-icon")
 
-    # if contract_content.style.display == "none":
+    if contract_content.style.display == "none":
+        contract_content.style.display = "flex"
+        card_icon_element.classList.replace('fa-chevron-right', 'fa-chevron-down')
 
-    #     view_func = pydom.create("div", classes="view-func")
-    #     pydom["#collapseContent"][0].append(view_func)
-    #     view_func.id = "vf"
-    #     view_func.style["display"] = "block"
-    #     card_icon_element.classList.replace('fa-chevron-right', 'fa-chevron-down')
-    #     contract_content.style.display = "block"
-
-    # else:
-    #     card_icon_element.classList.replace('fa-chevron-down', 'fa-chevron-right')
-    #     contract_content.style.display = "none"
-    
-
-
-
+    else:
+        card_icon_element.classList.replace('fa-chevron-down', 'fa-chevron-right')
+        contract_content.style.display = "none"
 
 
 def post_error(error):
-    error_element = pydom.create("div", classes=["error-post"])
-    pydom["#compileSidebar"][0].append(error_element)
-    error_element.id = "errorPost"
+    
+    error_element = document.querySelector(".error-post")
+    if not error_element:
+        error_element = pydom.create("div", classes=["error-post"])
+        pydom["#compileSidebar"][0].append(error_element)
+        error_element.id = "errorPost"
 
-    err_text_element = pydom.create("textarea")
-    pydom["#errorPost"][0].append(err_text_element)
-    err_text_element.type = "text"
-    err_text_element.id = "compileErrorText"
-    err_text_element.value = error
+        err_text_element = pydom.create("textarea")
+        pydom["#errorPost"][0].append(err_text_element)
+        err_text_element.type = "text"
+        err_text_element.id = "compileErrorText"
+        err_text_element.value = error
 
-    textarea = document.querySelector("#compileErrorText")
-    textarea.setAttribute("readonly", "true")
-    err_text_element.style["height"] = str(textarea.scrollHeight) + "px"
-    err_text_element.style["resize"] = "none"
-    err_text_element.style["display"] = "block"
+        textarea = document.querySelector("#compileErrorText")
+        textarea.setAttribute("readonly", "true")
+        err_text_element.style["height"] = str(textarea.scrollHeight) + "px"
+        err_text_element.style["resize"] = "none"
+        err_text_element.style["display"] = "block"
+
+    else:
+        err_text_element = document.querySelector("#compileErrorText")
+        err_text_element.value = error
 
 
 loop = asyncio.get_event_loop()
